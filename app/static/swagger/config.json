@@ -1,0 +1,2853 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Agrieco Connect API",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5000/api"
+    },
+    {
+      "url": "https://agrieco-connect-be.azurewebsites.net/api"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Feeds",
+      "description": "Feeds Operations"
+    },
+    {
+      "name": "Auth",
+      "description": "Authentication Operations"
+    },
+    {
+      "name": "Topics",
+      "description": "Topics Operations"
+    },
+    {
+      "name": "Marketplaces",
+      "description": "Marketplaces Operations"
+    },
+    {
+      "name": "Events",
+      "description": "Events Operations"
+    },
+    {
+      "name": "Subcommunities",
+      "description": "Subcommunities Operations"
+    },
+    {
+      "name": "Users",
+      "description": "Users Operations"
+    },
+    {
+      "name": "Appointments",
+      "description": "Appointment Availability Operations"
+    }
+  ],
+  "paths": {
+    "/feeds": {
+      "get": {
+        "tags": [
+          "Feeds"
+        ],
+        "summary": "Retrieve all feeds",
+        "responses": {
+          "200": {
+            "description": "Successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Feed"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Feeds"
+        ],
+        "summary": "Create a feed",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "content": {
+                    "type": "string",
+                    "description": "The content of the feed",
+                    "example": "This is a feed"
+                  },
+                  "photo": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "format": "binary",
+                      "description": "An image file to upload"
+                    }
+                  },
+                  "topics": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer",
+                      "format": "int64",
+                      "description": "IDs of the topics to associate with the feed"
+                    },
+                    "description": "List of topic IDs"
+                  },
+                  "community_id": {
+                    "type": "integer",
+                    "format": "int64",
+                    "description": "The ID of the community to associate with the feed"
+                  }
+                },
+                "required": [
+                  "content",
+                  "photo"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer",
+                      "example": 1
+                    },
+                    "content": {
+                      "type": "string",
+                      "example": "This is a feed"
+                    },
+                    "user_id": {
+                      "type": "integer",
+                      "example": 1
+                    },
+                    "created_at": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2023-07-07T10:00:00Z"
+                    },
+                    "updated_at": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2023-07-07T10:00:00Z"
+                    },
+                    "images": {
+                      "type": "string",
+                      "example": "uploads/image1.jpg,uploads/image2.jpg"
+                    },
+                    "is_active": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "topics": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Topic"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/feeds/trending-keywords": {
+      "get": {
+        "tags": [
+          "Feeds"
+        ],
+        "summary": "Retrieve trending keywords",
+        "responses": {
+          "200": {
+            "description": "Successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "keyword": {
+                        "type": "string",
+                        "example": "Agriculture"
+                      },
+                      "count": {
+                        "type": "integer",
+                        "example": 10
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/feeds/community/{id}": {
+      "get": {
+        "tags": [
+          "Feeds"
+        ],
+        "summary": "Retrieve feeds by community",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Feed"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/feeds/{id}": {
+      "get": {
+        "tags": [
+          "Feeds"
+        ],
+        "summary": "Retrieve specific feed",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Feed"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Feed not found"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Feeds"
+        ],
+        "summary": "Update a feed",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Feed"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Feed"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Feed not found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Feeds"
+        ],
+        "summary": "Delete a feed",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted successfully"
+          },
+          "404": {
+            "description": "Feed not found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/feeds/{id}/comments": {
+      "get": {
+        "tags": [
+          "Feeds"
+        ],
+        "summary": "Retrieve all comments of a feed",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 1
+                      },
+                      "content": {
+                        "type": "string",
+                        "example": "This is a comment"
+                      },
+                      "user_id": {
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 1
+                      },
+                      "feed_id": {
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 1
+                      },
+                      "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-07-07T10:00:00Z"
+                      },
+                      "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-07-07T10:00:00Z"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Feed not found"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Feeds"
+        ],
+        "summary": "Create a comment for a feed",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "content": {
+                    "type": "string",
+                    "example": "This is a comment"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Comment created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer",
+                      "example": 1
+                    },
+                    "content": {
+                      "type": "string",
+                      "example": "This is a comment"
+                    },
+                    "user_id": {
+                      "type": "integer",
+                      "example": 1
+                    },
+                    "feed_id": {
+                      "type": "integer",
+                      "example": 1
+                    },
+                    "created_at": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2023-07-07T10:00:00Z"
+                    },
+                    "updated_at": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2023-07-07T10:00:00Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/feeds/{id}/likes": {
+      "get": {
+        "tags": [
+          "Feeds"
+        ],
+        "summary": "Retrieve all likes of a feed",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 1
+                      },
+                      "user": {
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 1
+                      },
+                      "feed_id": {
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 1
+                      },
+                      "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-07-07T10:00:00Z"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Feed not found"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Feeds"
+        ],
+        "summary": "Like a feed",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Liked successfully"
+          },
+          "404": {
+            "description": "Feed not found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/feeds?topic_name={topic_name}": {
+      "get": {
+        "tags": [
+          "Feeds"
+        ],
+        "summary": "Retrieve feeds by topic",
+        "parameters": [
+          {
+            "name": "topic_name",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "Agriculture"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Feed"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Retrieve all users",
+        "responses": {
+          "200": {
+            "description": "Successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/{id}": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Retrieve specific user",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found"
+          }
+        }
+      }
+    },
+    "/users/{id}/follow": {
+      "put": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Follow a user",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Followed successfully"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/following": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Retrieve all users followed by the authenticated user",
+        "responses": {
+          "200": {
+            "description": "Successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/User"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/appointments": {
+      "get": {
+        "tags": [
+          "Appointments"
+        ],
+        "summary": "Retrieve all appointments",
+        "responses": {
+          "200": {
+            "description": "Successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 1
+                      },
+                      "user_id": {
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 1
+                      },
+                      "date": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-07-07T10:00:00Z"
+                      },
+                      "start_time": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-07-07T10:00:00Z"
+                      },
+                      "end_time": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-07-07T10:00:00Z"
+                      },
+                      "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-07-07T10:00:00Z"
+                      },
+                      "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-07-07T10:00:00Z"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/topics": {
+      "get": {
+        "tags": [
+          "Topics"
+        ],
+        "summary": "Retrieve all topics",
+        "responses": {
+          "200": {
+            "description": "Successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Topic"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Topics"
+        ],
+        "summary": "Create a topic",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Topic"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Topic"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/topics/{id}": {
+      "get": {
+        "tags": [
+          "Topics"
+        ],
+        "summary": "Retrieve specific topic",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Topic"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Topic not found"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Topics"
+        ],
+        "summary": "Update a topic",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Topic"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Topic"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Topic not found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Topics"
+        ],
+        "summary": "Delete a topic",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted successfully"
+          },
+          "404": {
+            "description": "Topic not found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Login",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Auth"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid credentials"
+          }
+        }
+      }
+    },
+    "/auth/register": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Register",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Register"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Register successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/forgot-password": {
+      "post": {
+        "summary": "Send password reset link to user's email",
+        "tags": [
+          "Auth"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "description": "The email address of the user"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password reset link sent successfully"
+          },
+          "404": {
+            "description": "User not found"
+          },
+          "500": {
+            "description": "Failed to send email"
+          }
+        }
+      }
+    },
+    "/auth/reset-password": {
+      "post": {
+        "summary": "Reset user's password using a reset code",
+        "tags": [
+          "Auth"
+        ],
+        "parameters": [
+          {
+            "name": "reset_code",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The reset code sent to the user's email"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "description": "The email address of the user"
+                  },
+                  "new_password": {
+                    "type": "string",
+                    "description": "The new password"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password reset successful"
+          },
+          "400": {
+            "description": "Invalid reset code"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        }
+      }
+    },
+    "/marketplaces/items": {
+      "get": {
+        "tags": [
+          "Marketplaces"
+        ],
+        "summary": "Retrieve all items",
+        "responses": {
+          "200": {
+            "description": "Successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Product"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Marketplaces"
+        ],
+        "summary": "Create a new item",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "The name of the item",
+                    "example": "Apple"
+                  },
+                  "price": {
+                    "type": "number",
+                    "format": "float",
+                    "description": "The price of the item",
+                    "example": 1.5
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "The description of the item",
+                    "example": "Fresh red apple"
+                  },
+                  "image": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "The image of the item"
+                  }
+                },
+                "required": [
+                  "name",
+                  "price",
+                  "description",
+                  "image"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Item created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Product"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/marketplaces/items/{id}": {
+      "get": {
+        "tags": [
+          "Marketplaces"
+        ],
+        "summary": "Retrieve a specific item",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Product"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Item not found"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Marketplaces"
+        ],
+        "summary": "Update a item",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Product"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Item updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Product"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Item not found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Marketplaces"
+        ],
+        "summary": "Delete a item",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Item deleted successfully"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Item not found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/events": {
+      "get": {
+        "tags": [
+          "Events"
+        ],
+        "summary": "Retrieve all events",
+        "responses": {
+          "200": {
+            "description": "Successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 1
+                      },
+                      "title": {
+                        "type": "string",
+                        "example": "Event name"
+                      },
+                      "description": {
+                        "type": "string",
+                        "example": "Event description"
+                      },
+                      "location": {
+                        "type": "string",
+                        "example": "Event location"
+                      },
+                      "date": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-07-07T10:00:00Z"
+                      },
+                      "start_time": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-07-07T10:00:00Z"
+                      },
+                      "end_time": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-07-07T10:00:00Z"
+                      },
+                      "image": {
+                        "type": "string",
+                        "example": "https://example.com/image.jpg"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Events"
+        ],
+        "summary": "Create a new event",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "description": "The name of the event",
+                    "example": "Event name"
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "The description of the event",
+                    "example": "Event description"
+                  },
+                  "location": {
+                    "type": "string",
+                    "description": "The location of the event",
+                    "example": "Event location"
+                  },
+                  "date": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "The date of the event",
+                    "example": "2023-07-07T10:00:00Z"
+                  },
+                  "start_time": {
+                    "type": "string",
+                    "format": "string",
+                    "description": "The start time of the event",
+                    "example": "11:00AM"
+                  },
+                  "end_time": {
+                    "type": "string",
+                    "format": "string",
+                    "description": "The end time of the event",
+                    "example": "12:00PM"
+                  },
+                  "image": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "The image of the event"
+                  }
+                },
+                "required": [
+                  "title",
+                  "description",
+                  "location",
+                  "date",
+                  "start_time",
+                  "end_time"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Event created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer",
+                      "format": "int64",
+                      "example": 1
+                    },
+                    "title": {
+                      "type": "string",
+                      "example": "Event name"
+                    },
+                    "description": {
+                      "type": "string",
+                      "example": "Event description"
+                    },
+                    "location": {
+                      "type": "string",
+                      "example": "Event location"
+                    },
+                    "date": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2023-07-07T10:00:00Z"
+                    },
+                    "start_time": {
+                      "type": "string",
+                      "format": "string",
+                      "example": "11:00AM"
+                    },
+                    "end_time": {
+                      "type": "string",
+                      "format": "string",
+                      "example": "12:00PM"
+                    },
+                    "image": {
+                      "type": "string",
+                      "example": "https://example.com/image.jpg"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/events/{id}": {
+      "get": {
+        "tags": [
+          "Events"
+        ],
+        "summary": "Retrieve a specific event",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer",
+                      "format": "int64",
+                      "example": 1
+                    },
+                    "title": {
+                      "type": "string",
+                      "example": "Event name"
+                    },
+                    "description": {
+                      "type": "string",
+                      "example": "Event description"
+                    },
+                    "location": {
+                      "type": "string",
+                      "example": "Event location"
+                    },
+                    "date": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2023-07-07T10:00:00Z"
+                    },
+                    "start_time": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2023-07-07T10:00:00Z"
+                    },
+                    "end_time": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2023-07-07T10:00:00Z"
+                    },
+                    "image": {
+                      "type": "string",
+                      "example": "https://example.com/image.jpg"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Event not found"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Events"
+        ],
+        "summary": "Update an event",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string",
+                    "description": "The name of the event",
+                    "example": "Event name"
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "The description of the event",
+                    "example": "Event description"
+                  },
+                  "location": {
+                    "type": "string",
+                    "description": "The location of the event",
+                    "example": "Event location"
+                  },
+                  "date": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "The date of the event",
+                    "example": "2023-07-07T10:00:00Z"
+                  },
+                  "start_time": {
+                    "type": "string",
+                    "format": "string",
+                    "description": "The start time of the event",
+                    "example": "11:00AM"
+                  },
+                  "end_time": {
+                    "type": "string",
+                    "format": "string",
+                    "description": "The end time of the event",
+                    "example": "12:00PM"
+                  },
+                  "image": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "The image of the event"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer",
+                      "format": "int64",
+                      "example": 1
+                    },
+                    "title": {
+                      "type": "string",
+                      "example": "Event name"
+                    },
+                    "description": {
+                      "type": "string",
+                      "example": "Event description"
+                    },
+                    "location": {
+                      "type": "string",
+                      "example": "Event location"
+                    },
+                    "date": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2023-07-07T10:00:00Z"
+                    },
+                    "start_time": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2023-07-07T10:00:00Z"
+                    },
+                    "end_time": {
+                      "type": "string",
+                      "format": "date-time",
+                      "example": "2023-07-07T10:00:00Z"
+                    },
+                    "image": {
+                      "type": "string",
+                      "example": "https://example.com/image.jpg"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Event not found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Events"
+        ],
+        "summary": "Delete an event",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted successfully"
+          },
+          "404": {
+            "description": "Event not found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/events/{id}/attendees": {
+      "get": {
+        "tags": [
+          "Events"
+        ],
+        "summary": "Retrieve all attendees of an event",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 1
+                      },
+                      "user_id": {
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 1
+                      },
+                      "event_id": {
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 1
+                      },
+                      "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-07-07T10:00:00Z"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Event not found"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Events"
+        ],
+        "summary": "Attend an event",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Attended successfully"
+          },
+          "404": {
+            "description": "Event not found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/communities": {
+      "get": {
+        "tags": [
+          "Subcommunities"
+        ],
+        "summary": "Retrieve all communities",
+        "responses": {
+          "200": {
+            "description": "Successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 1
+                      },
+                      "name": {
+                        "type": "string",
+                        "example": "Community name"
+                      },
+                      "description": {
+                        "type": "string",
+                        "example": "Community description"
+                      },
+                      "location": {
+                        "type": "string",
+                        "example": "Community location"
+                      },
+                      "category": {
+                        "type": "string",
+                        "example": "Community category"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Subcommunities"
+        ],
+        "summary": "Create a new community",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "The name of the community",
+                    "example": "Community name"
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "The description of the community",
+                    "example": "Community description"
+                  },
+                  "location": {
+                    "type": "string",
+                    "description": "The location of the community",
+                    "example": "Community location"
+                  },
+                  "category": {
+                    "type": "string",
+                    "description": "The category of the community",
+                    "example": "Community category"
+                  }
+                },
+                "required": [
+                  "name",
+                  "description"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Community created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer",
+                      "format": "int64",
+                      "example": 1
+                    },
+                    "name": {
+                      "type": "string",
+                      "example": "Community name"
+                    },
+                    "description": {
+                      "type": "string",
+                      "example": "Community description"
+                    },
+                    "location": {
+                      "type": "string",
+                      "example": "Community location"
+                    },
+                    "category": {
+                      "type": "string",
+                      "example": "Community category"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/communities/{id}": {
+      "get": {
+        "tags": [
+          "Subcommunities"
+        ],
+        "summary": "Retrieve a specific community",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer",
+                      "format": "int64",
+                      "example": 1
+                    },
+                    "name": {
+                      "type": "string",
+                      "example": "Community name"
+                    },
+                    "description": {
+                      "type": "string",
+                      "example": "Community description"
+                    },
+                    "location": {
+                      "type": "string",
+                      "example": "Community location"
+                    },
+                    "category": {
+                      "type": "string",
+                      "example": "Community category"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Community not found"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Subcommunities"
+        ],
+        "summary": "Update a community",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "The name of the community",
+                    "example": "Community name"
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "The description of the community",
+                    "example": "Community description"
+                  },
+                  "location": {
+                    "type": "string",
+                    "description": "The location of the community",
+                    "example": "Community location"
+                  },
+                  "category": {
+                    "type": "string",
+                    "description": "The category of the community",
+                    "example": "Community category"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer",
+                      "format": "int64",
+                      "example": 1
+                    },
+                    "name": {
+                      "type": "string",
+                      "example": "Community name"
+                    },
+                    "description": {
+                      "type": "string",
+                      "example": "Community description"
+                    },
+                    "location": {
+                      "type": "string",
+                      "example": "Community location"
+                    },
+                    "category": {
+                      "type": "string",
+                      "example": "Community category"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Community not found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Subcommunities"
+        ],
+        "summary": "Delete a community",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/communities/{id}/members": {
+      "get": {
+        "tags": [
+          "Subcommunities"
+        ],
+        "summary": "Retrieve all members of a community",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 1
+                      },
+                      "username": {
+                        "type": "string",
+                        "example": "username"
+                      },
+                      "email": {
+                        "type": "string",
+                        "example": "test@email.com"
+                      },
+                      "fullname": {
+                        "type": "string",
+                        "example": "John Doe"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Subcommunities"
+        ],
+        "summary": "Join a community",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Joined successfully"
+          },
+          "404": {
+            "description": "Community not found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/communities/{id}/feeds": {
+      "get": {
+        "tags": [
+          "Subcommunities"
+        ],
+        "summary": "Retrieve all feeds of a community",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Feed"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/communities/my-communities": {
+      "get": {
+        "tags": [
+          "Subcommunities"
+        ],
+        "summary": "Retrieve all communities joined by the authenticated user",
+        "responses": {
+          "200": {
+            "description": "Successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 1
+                      },
+                      "name": {
+                        "type": "string",
+                        "example": "Community name"
+                      },
+                      "description": {
+                        "type": "string",
+                        "example": "Community description"
+                      },
+                      "location": {
+                        "type": "string",
+                        "example": "Community location"
+                      },
+                      "category": {
+                        "type": "string",
+                        "example": "Community category"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/appointments": {
+      "get": {
+        "tags": [
+          "Appointments"
+        ],
+        "summary": "Retrieve all appointment availabilities",
+        "responses": {
+          "200": {
+            "description": "Successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AppointmentAvailability"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Appointments"
+        ],
+        "summary": "Create a new appointment availability",
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "availabilitySlotStart": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2023-07-07T10:00:00Z"
+                  },
+                  "availabilitySlotEnd": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2023-07-07T10:00:00Z"
+                  },
+                  "company_name": {
+                    "type": "string",
+                    "example": "Company XYZ"
+                  },
+                  "location": {
+                    "type": "string",
+                    "example": "123 Street, City"
+                  },
+                  "contact_information": {
+                    "type": "string",
+                    "example": "123-456-7890"
+                  },
+                  "bio": {
+                    "type": "string",
+                    "example": "Bio information"
+                  },
+                  "specialty": {
+                    "type": "string",
+                    "example": "Specialty information"
+                  },
+                  "experience_level": {
+                    "type": "string",
+                    "example": "Experience level information"
+                  }
+                },
+                "required": [
+                  "availability_time"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppointmentAvailability"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/appointments/{id}": {
+      "get": {
+        "tags": [
+          "Appointments"
+        ],
+        "summary": "Retrieve specific appointment availability",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppointmentAvailability"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Appointment availability not found"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Appointments"
+        ],
+        "summary": "Update an appointment availability",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "availability_time": {
+                    "type": "string",
+                    "format": "date-time",
+                    "example": "2023-07-07T10:00:00Z"
+                  },
+                  "company_name": {
+                    "type": "string",
+                    "example": "Company XYZ"
+                  },
+                  "location": {
+                    "type": "string",
+                    "example": "123 Street, City"
+                  },
+                  "contact_information": {
+                    "type": "string",
+                    "example": "123-456-7890"
+                  },
+                  "bio": {
+                    "type": "string",
+                    "example": "Bio information"
+                  },
+                  "specialty": {
+                    "type": "string",
+                    "example": "Specialty information"
+                  },
+                  "experience_level": {
+                    "type": "string",
+                    "example": "Experience level information"
+                  }
+                },
+                "required": [
+                  "availability_time"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppointmentAvailability"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Appointments"
+        ],
+        "summary": "Delete an appointment availability",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted successfully"
+          },
+          "404": {
+            "description": "Appointment availability not found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/appointments/{id}/bookings": {
+      "get": {
+        "tags": [
+          "Appointments"
+        ],
+        "summary": "Retrieve all bookings of an appointment availability",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 1
+                      },
+                      "user_id": {
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 1
+                      },
+                      "appointment_id": {
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 1
+                      },
+                      "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2023-07-07T10:00:00Z"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Appointment availability not found"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Appointments"
+        ],
+        "summary": "Book an appointment availability",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Booked successfully"
+          },
+          "404": {
+            "description": "Appointment availability not found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Appointments"
+        ],
+        "summary": "Cancel a booking",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Cancelled successfully"
+          },
+          "404": {
+            "description": "Booking not found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "PostFeed": {
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "string",
+            "example": "This is a feed"
+          },
+          "images": {
+            "type": "string",
+            "example": "image.jpg, image2.jpg"
+          },
+          "user_id": {
+            "type": "integer",
+            "format": "int64",
+            "example": 1
+          }
+        }
+      },
+      "Feed": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "example": 1
+          },
+          "content": {
+            "type": "string",
+            "example": "This is a feed"
+          },
+          "images": {
+            "type": "string",
+            "example": "image.jpg, image2.jpg"
+          },
+          "user_id": {
+            "type": "integer",
+            "format": "int64",
+            "example": 1
+          }
+        }
+      },
+      "Auth": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "example": "username"
+          },
+          "password": {
+            "type": "string",
+            "example": "password"
+          }
+        }
+      },
+      "Register": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "example": "username"
+          },
+          "email": {
+            "type": "string",
+            "example": "test@email.com"
+          },
+          "fullname": {
+            "type": "string",
+            "example": "John Doe"
+          },
+          "password": {
+            "type": "string",
+            "example": "password"
+          },
+          "interested_topics_ids": {
+            "type": "string",
+            "example": "1,2,3"
+          }
+        }
+      },
+      "Topic": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "example": "Agriculture"
+          },
+          "description": {
+            "type": "string",
+            "example": "This is an agriculture topic"
+          }
+        }
+      },
+      "Product": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int64",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "example": "Apple"
+          },
+          "price": {
+            "type": "number",
+            "format": "float",
+            "example": 1.5
+          },
+          "description": {
+            "type": "string",
+            "example": "Fresh red apple"
+          },
+          "image": {
+            "type": "string",
+            "example": "static/uploads/items_images/apple.jpg"
+          },
+          "user_id": {
+            "type": "integer",
+            "format": "int64",
+            "example": 1
+          }
+        }
+      },
+      "AppointmentAvailability": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "user_id": {
+            "type": "integer",
+            "example": 1
+          },
+          "availabilitySlotStart": {
+            "type": "string",
+            "example": "2023-07-07T10:00:00Z"
+          },
+          "availabilitySlotEnd": {
+            "type": "string",
+            "example": "2023-07-07T10:00:00Z"
+          },
+          "company_name": {
+            "type": "string",
+            "example": "Company XYZ"
+          },
+          "location": {
+            "type": "string",
+            "example": "123 Street, City"
+          },
+          "contact_information": {
+            "type": "string",
+            "example": "123-456-7890"
+          },
+          "bio": {
+            "type": "string",
+            "example": "Bio information"
+          },
+          "specialty": {
+            "type": "string",
+            "example": "Specialty information"
+          },
+          "experience_level": {
+            "type": "string",
+            "example": "Experience level information"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}
