@@ -34,7 +34,7 @@ class TopicResource(Resource):
             return topic.serialize()
         return None
     
-    @jwt_required
+    @jwt_required()
     def put(self, id):
         user_id = get_jwt_identity()
         if not check_if_user_is_admin(user_id):
@@ -49,7 +49,7 @@ class TopicResource(Resource):
             db.session.commit()
             return topic.serialize()
         return None
-    @jwt_required
+    @jwt_required()
     def delete(self, id):
         user_id = get_jwt_identity()
         if not check_if_user_is_admin(user_id):

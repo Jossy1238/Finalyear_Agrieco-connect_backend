@@ -17,35 +17,34 @@ class TrendingKeywords:
         topics = Topic.query.all()
         topic_names = [topic.name for topic in topics]
 
-        # Create a request to the OpenAI ChatCompletion API
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",  # Specify the model to use
-            messages=[
-                {
-                    "role": "system",
-                    "content": (
-                        "You are an AI that analyzes text to extract trending topics. "
-                        "Given the following text, return a list of only five items containing any of these keywords: "
-                        + ", ".join(topic_names)  # Include the topic names in the system message
-                    ),
-                },
-                {"role": "user", "content": text},  # Provide the user's text
-            ],
-            temperature=0
-        )
+        try:
+            response = openai.ChatCompletion.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {
+                        "role": "system",
+                        "content": (
+                            "You are an AI that analyzes text to extract trending topics. "
+                            "Given the following text, return a list of only five items containing any of these keywords: "
+                            + ", ".join(topic_names)
+                        ),
+                    },
+                    {"role": "user", "content": text},
+                ],
+            )
 
-        # Extract the response text from the API response
-        response_text = response.choices[0].message['content'].strip()
+            response_text = response.choices[0].message['content'].strip()
 
-        # Initialize a list to hold the keywords and perform the cleaning of the output
-        keywords = []
-        for kw in response_text.split('\n'):
-            # Remove any leading numbers and dots from the keyword
-            kw_clean = re.sub(r'^\d+\.\s*', '', kw).strip()
-            if kw_clean in topic_names:
-                keywords.append(kw_clean)
+            keywords = []
+            for kw in response_text.split('\n'):
+                # Remove any leading numbers and dots
+                kw_clean = re.sub(r'^\d+\.\s*', '', kw).strip()
+                if kw_clean in topic_names:
+                    keywords.append(kw_clean)
 
-        return keywords
+            return keywords
+        except Exception as e:
+            return []
 
     def get_trending_keywords(self, feed_contents, top_n=5):
         # Initialize a list to hold all keywords from the feed contents
@@ -64,16 +63,19 @@ class TrendingKeywords:
     
     
     def get_random_facts(self):
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {
-                    "role": "system",
-                    "content": "You are an AI that generates random facts about things to do with agriculture, poultry, farming or fishing. Please generate a random fact for me and start the response with the fact directly",
-                },
-            ],
-        )
+        try:
+            response = openai.ChatCompletion.create(
+                model="gpt-3.5-turbo",
+                messages=[
+                    {
+                        "role": "system",
+                        "content": "You are an AI that generates random facts about things to do with agriculture, poultry, farming or fishing. Please generate a random fact for me and start the response with the fact directly",
+                    },
+                ],
+            )
 
-        response_text = response.choices[0].message['content'].strip()
-        return response_text
+            response_text = response.choices[0].message['content'].strip()
+            return response_text
+        except Exception as e:
+            return "We could not generate a random fact at this time. Please try again later."
 
